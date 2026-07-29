@@ -3,38 +3,36 @@
  * ---------------------------------------------------------------------------
  * Orquestador del panel de administración (admin.html).
  *
- * Coordina los módulos sin implementar reglas propias:
- *   auth.js     → quién puede entrar
- *   storage.js  → de dónde se leen los datos
- *   bracket.js  → qué significa cargar un resultado
- *   github.js   → cómo se persiste
- *   ui.js       → cómo se muestra
+ * Responsabilidad acotada: arranque, control de acceso, carga inicial y
+ * conexión entre el estado compartido y los controladores de cada pestaña.
+ * La lógica de cada pantalla vive en su propio módulo:
  *
- * Flujo de guardado de un partido:
- *   validar → aplicar en memoria (con propagación y cascada) → confirmar →
- *   commitear en GitHub → refrescar la vista.
+ *   admin-resultados.js  carga de marcadores
+ *   admin-equipos.js     carga masiva de participantes
+ *   admin-reinicio.js    reinicio del torneo
+ *
+ * Todos leen y escriben a través de admin-estado.js, que garantiza que las tres
+ * pestañas vean siempre el mismo torneo.
  */
 
 import { CONFIG } from './config.js';
 import { iniciarSesion, cerrarSesion, exigirSesion } from './auth.js';
-import { cargarTorneo, obtenerToken } from './storage.js';
-import { aplicarResultado, crearVistaBracket, calcularAvance, ESTADO } from './bracket.js';
-import { actualizarTorneo, verificarAcceso } from './github.js';
+import { obtenerToken } from './storage.js';
+import { verificarAcceso } from './github.js';
+import { suscribir, recargar, limpiar } from './admin-estado.js';
+import * as resultados from './admin-resultados.js';
+import * as equipos from './admin-equipos.js';
+import * as reinicio from './admin-reinicio.js';
 import {
-  renderizarBracket,
-  renderizarEncabezado,
   alternarSpinner,
   alternarBotonOcupado,
   mostrarToast,
   mostrarErrorEnBloque,
   mostrarAlerta,
   ocultarAlerta,
-  confirmar,
-  crearElemento,
-  escapar,
 } from './ui.js';
 
-/** Referencias al DOM. */
+/** Referencias al DOM comunes al panel. */
 const dom = {
   vistaLogin: document.getElementById('vista-login'),
   vistaPanel: document.getElementById('vista-panel'),
@@ -48,16 +46,14 @@ const dom = {
   botonSalir: document.getElementById('boton-salir'),
   botonRecargar: document.getElementById('boton-recargar'),
   spinner: document.getElementById('spinner'),
-  encabezado: document.getElementById('encabezado-torneo'),
   bracket: document.getElementById('contenedor-bracket'),
 };
 
 /**
- * Estado de la aplicación. Único objeto mutable del módulo: mantener el torneo
- * en un solo lugar evita que la vista y los datos se desincronicen.
- * @type {{torneo: object|null}}
+ * Controladores de pestaña. Cada uno expone `inicializar(dom)` y
+ * `renderizar(torneo)`: un contrato uniforme que permite tratarlos en conjunto.
  */
-const estado = { torneo: null };
+const pestanias = [resultados, equipos, reinicio];
 
 // ---------------------------------------------------------------------------
 // Arranque y control de acceso
@@ -73,7 +69,7 @@ function iniciar() {
 
   dom.formLogin.addEventListener('submit', manejarLogin);
   dom.botonSalir.addEventListener('click', manejarLogout);
-  dom.botonRecargar.addEventListener('click', () => cargarYRenderizar({ avisar: true }));
+  dom.botonRecargar.addEventListener('click', () => cargarTorneo({ avisar: true }));
 
   exigirSesion(abrirPanel, mostrarLogin);
 }
@@ -85,11 +81,48 @@ function mostrarLogin() {
   dom.inputUsuario.focus();
 }
 
-/** Muestra el panel y dispara la carga inicial del torneo. */
+/**
+ * Construye el panel: inicializa las pestañas, las suscribe al estado y dispara
+ * la carga inicial. Todo esto ocurre sólo con sesión válida.
+ */
 function abrirPanel() {
   dom.vistaLogin.classList.add('d-none');
   dom.vistaPanel.classList.remove('d-none');
-  cargarYRenderizar();
+
+  inicializarPestanias();
+
+  // Un único punto de re-render: cuando el estado cambia, todas las pestañas se
+  // actualizan, sin importar cuál originó el cambio.
+  suscribir((torneo) => pestanias.forEach((pestania) => pestania.renderizar(torneo)));
+
+  cargarTorneo();
+}
+
+/** Entrega a cada controlador las referencias del DOM que le corresponden. */
+function inicializarPestanias() {
+  resultados.inicializar({
+    encabezado: document.getElementById('encabezado-torneo'),
+    bracket: dom.bracket,
+  });
+
+  equipos.inicializar({
+    nombre: document.getElementById('input-nombre-torneo'),
+    fecha: document.getElementById('input-fecha-torneo'),
+    textarea: document.getElementById('input-equipos'),
+    resumen: document.getElementById('resumen-equipos'),
+    avisos: document.getElementById('avisos-equipos'),
+    preview: document.getElementById('preview-bracket'),
+    botonCompletar: document.getElementById('boton-completar-cuadro'),
+    botonCargarActuales: document.getElementById('boton-cargar-actuales'),
+    botonPublicar: document.getElementById('boton-publicar-cuadro'),
+  });
+
+  reinicio.inicializar({
+    resumen: document.getElementById('resumen-reinicio'),
+    listaParticipantes: document.getElementById('participantes-conservados'),
+    confirmacion: document.getElementById('input-confirmacion-reinicio'),
+    boton: document.getElementById('boton-reiniciar'),
+  });
 }
 
 /**
@@ -129,28 +162,28 @@ async function manejarLogin(evento) {
   }
 }
 
-/** Cierra la sesión, descarta el token y vuelve al login. */
+/** Cierra la sesión, descarta el token y el estado, y vuelve al login. */
 function manejarLogout() {
   cerrarSesion();
-  estado.torneo = null;
+  limpiar();
   dom.bracket.innerHTML = '';
   mostrarLogin();
   mostrarToast('Sesión cerrada.', 'info');
 }
 
 // ---------------------------------------------------------------------------
-// Carga y render
+// Carga de datos
 // ---------------------------------------------------------------------------
 
 /**
- * Trae el torneo publicado y redibuja el panel.
+ * Trae el torneo publicado. El store notifica a las pestañas, así que acá sólo
+ * se maneja el spinner y el error.
  * @param {{avisar?: boolean}} [opciones] avisar: muestra un toast al terminar
  */
-async function cargarYRenderizar({ avisar = false } = {}) {
+async function cargarTorneo({ avisar = false } = {}) {
   alternarSpinner(dom.spinner, true);
   try {
-    estado.torneo = await cargarTorneo();
-    renderizar();
+    await recargar();
     if (avisar) mostrarToast('Torneo actualizado desde el repositorio.', 'exito');
   } catch (error) {
     mostrarErrorEnBloque(dom.bracket, 'No se pudo cargar el torneo', error.message);
@@ -158,130 +191,6 @@ async function cargarYRenderizar({ avisar = false } = {}) {
   } finally {
     alternarSpinner(dom.spinner, false);
   }
-}
-
-/** Redibuja encabezado y bracket a partir del estado actual. */
-function renderizar() {
-  const vista = crearVistaBracket(estado.torneo);
-  renderizarEncabezado(dom.encabezado, vista, calcularAvance(estado.torneo));
-  renderizarBracket(dom.bracket, vista, { pie: crearFormularioPartido });
-}
-
-// ---------------------------------------------------------------------------
-// Formulario de carga de resultados
-// ---------------------------------------------------------------------------
-
-/**
- * Construye el formulario que se inyecta al pie de cada tarjeta.
- *
- * Los partidos sin ambos participantes definidos no son editables: en su lugar
- * se muestra una leyenda, porque cargar un resultado ahí no tiene sentido.
- *
- * @param {object} partido partido de la vista
- * @returns {HTMLElement}
- */
-function crearFormularioPartido(partido) {
-  if (partido.estado === ESTADO.PENDIENTE) {
-    return crearElemento('p', {
-      clases: ['small', 'text-body-secondary', 'mb-0'],
-      texto: 'Esperando a los clasificados de la ronda anterior.',
-    });
-  }
-
-  const formulario = crearElemento('form', {
-    clases: ['partido__form'],
-    attrs: { 'data-partido': partido.id, novalidate: '' },
-    html: `
-      <div class="partido__scores">
-        <label class="visually-hidden" for="score1-${escapar(partido.id)}">Marcador de ${escapar(partido.equipo1)}</label>
-        <input class="form-control form-control-sm" type="number" min="0" step="1" inputmode="numeric"
-               id="score1-${escapar(partido.id)}" name="score1" value="${escapar(partido.score1 ?? 0)}" required>
-        <span class="partido__separador" aria-hidden="true">–</span>
-        <label class="visually-hidden" for="score2-${escapar(partido.id)}">Marcador de ${escapar(partido.equipo2)}</label>
-        <input class="form-control form-control-sm" type="number" min="0" step="1" inputmode="numeric"
-               id="score2-${escapar(partido.id)}" name="score2" value="${escapar(partido.score2 ?? 0)}" required>
-      </div>
-      <button type="submit" class="btn btn-sm btn-primary w-100 mt-2">Guardar</button>`,
-  });
-
-  formulario.addEventListener('submit', (evento) => manejarGuardado(evento, partido));
-  return formulario;
-}
-
-/**
- * Maneja el guardado de un partido de punta a punta.
- * @param {SubmitEvent} evento
- * @param {object} partido
- */
-async function manejarGuardado(evento, partido) {
-  evento.preventDefault();
-
-  const formulario = evento.currentTarget;
-  const boton = formulario.querySelector('button[type="submit"]');
-  const score1 = Number.parseInt(formulario.elements.score1.value, 10);
-  const score2 = Number.parseInt(formulario.elements.score2.value, 10);
-
-  // 1. Aplicar el resultado en memoria. El dominio valida y propaga.
-  const resultado = aplicarResultado(estado.torneo, partido.id, score1, score2);
-  if (!resultado.ok) {
-    mostrarToast(resultado.error, 'error');
-    return;
-  }
-
-  // 2. Confirmar, advirtiendo si el cambio invalida resultados posteriores.
-  const confirmado = await confirmar({
-    titulo: 'Confirmar resultado',
-    mensaje: `${partido.equipo1} ${score1} – ${score2} ${partido.equipo2}. Gana ${resultado.ganador}.`,
-    detalle: describirConsecuencias(resultado),
-    textoConfirmar: 'Guardar y commitear',
-  });
-  if (!confirmado) return;
-
-  // 3. Persistir en GitHub. Sólo si el commit sale bien se adopta el estado.
-  alternarBotonOcupado(boton, true);
-  try {
-    const commit = await actualizarTorneo(
-      resultado.torneo,
-      CONFIG.github.mensajeCommit.replace(
-        '{partido}',
-        `${partido.equipo1} vs ${partido.equipo2} (${score1}-${score2})`
-      )
-    );
-
-    estado.torneo = resultado.torneo;
-    renderizar();
-    mostrarToast(`Guardado. Commit ${commit.commit} publicado; GitHub Pages tarda un momento.`, 'exito');
-  } catch (error) {
-    mostrarToast(error.message, 'error');
-    console.error('[admin] Error al guardar en GitHub:', error);
-    alternarBotonOcupado(boton, false);
-  }
-}
-
-/**
- * Redacta la advertencia que acompaña a la confirmación cuando el cambio
- * arrastra consecuencias sobre otros partidos.
- * @param {{avanzaA: object|null, ganador: string, invalidados: object[]}} resultado
- * @returns {string} cadena vacía si no hay nada que advertir
- */
-function describirConsecuencias(resultado) {
-  const partes = [];
-
-  if (resultado.avanzaA) {
-    partes.push(`${resultado.ganador} avanza al partido #${resultado.avanzaA.id}.`);
-  } else {
-    partes.push(`${resultado.ganador} se consagra campeón del torneo.`);
-  }
-
-  if (resultado.invalidados.length > 0) {
-    const ids = resultado.invalidados.map((p) => `#${p.id}`).join(', ');
-    partes.push(
-      `Cambia el clasificado, así que se borrarán los resultados de ${resultado.invalidados.length} ` +
-      `partido(s) posterior(es): ${ids}.`
-    );
-  }
-
-  return partes.join(' ');
 }
 
 iniciar();

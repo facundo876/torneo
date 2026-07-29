@@ -34,6 +34,10 @@ export const CONFIG = Object.freeze({
     token: '',
     /** Plantilla del mensaje de commit. `{partido}` se reemplaza en runtime. */
     mensajeCommit: 'chore(torneo): actualiza resultado de {partido}',
+    /** Mensaje al rearmar el cuadro por carga masiva. `{cantidad}` en runtime. */
+    mensajeCommitEquipos: 'feat(torneo): nuevo cuadro con {cantidad} participantes',
+    /** Mensaje al reiniciar el torneo conservando los participantes. */
+    mensajeCommitReinicio: 'chore(torneo): reinicia el torneo y borra los resultados',
     /** Endpoint base de la API. Se centraliza para poder apuntar a GH Enterprise. */
     apiBase: 'https://api.github.com',
   }),

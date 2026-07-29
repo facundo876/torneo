@@ -323,7 +323,7 @@ export function crearVistaBracket(torneo) {
     const conectores = Boolean(siguiente) && siguiente.partidos.length * 2 === ronda.partidos.length;
 
     return {
-      nombre: ronda.nombre || nombrePorDefecto(indice, torneo.rondas.length),
+      nombre: ronda.nombre || nombreDeRonda(indice, torneo.rondas.length),
       indice,
       esUltima: indice === torneo.rondas.length - 1,
       conectores,
@@ -345,13 +345,17 @@ export function crearVistaBracket(torneo) {
 }
 
 /**
- * Nombre de ronda por defecto cuando el JSON no lo especifica, deducido de la
- * distancia a la final.
+ * Nombre de ronda deducido de la distancia a la final.
+ *
+ * Se usa como valor por defecto cuando el JSON no trae `nombre`, y también al
+ * generar un torneo desde cero (ver generador.js): así existe una única tabla
+ * de nombres de ronda en todo el proyecto.
+ *
  * @param {number} indice
  * @param {number} total
  * @returns {string}
  */
-function nombrePorDefecto(indice, total) {
+export function nombreDeRonda(indice, total) {
   const restantes = total - indice;
   const nombres = { 1: 'Final', 2: 'Semifinal', 3: 'Cuartos', 4: 'Octavos', 5: 'Dieciseisavos' };
   return nombres[restantes] || `Ronda ${indice + 1}`;

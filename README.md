@@ -29,20 +29,25 @@ Administrador → carga marcador → valida → propaga al siguiente partido
 
 ```
 /
-├── index.html          Vista pública (sólo lectura)
-├── admin.html          Login + panel de administración
-├── css/styles.css      Layout del bracket, conectores y código de colores
+├── index.html                Vista pública (sólo lectura)
+├── admin.html                Login + panel de administración (3 pestañas)
+├── css/styles.css            Layout del bracket, conectores y código de colores
 ├── js/
-│   ├── config.js       Única fuente de configuración
-│   ├── storage.js      Lectura del JSON y persistencia de sesión
-│   ├── bracket.js      Dominio puro: estructura, validación, propagación
-│   ├── ui.js           Presentación: spinner, toasts, modales, render
-│   ├── github.js       Escritura vía GitHub REST API
-│   ├── auth.js         Login y guardia de sesión
-│   ├── app.js          Orquestador de la vista pública
-│   └── admin.js        Orquestador del panel
-├── data/torneo.json    Estado del torneo, versionado
-└── assets/             Recursos estáticos
+│   ├── config.js             Única fuente de configuración
+│   ├── storage.js            Lectura del JSON y persistencia de sesión
+│   ├── bracket.js            Dominio: resultados, validación, propagación
+│   ├── generador.js          Dominio: armado del cuadro y reinicio
+│   ├── ui.js                 Presentación: spinner, toasts, modales, render
+│   ├── github.js             Escritura vía GitHub REST API
+│   ├── auth.js               Login y guardia de sesión
+│   ├── app.js                Orquestador de la vista pública
+│   ├── admin.js              Orquestador del panel: acceso y navegación
+│   ├── admin-estado.js       Estado compartido entre pestañas
+│   ├── admin-resultados.js   Pestaña "Resultados"
+│   ├── admin-equipos.js      Pestaña "Equipos" (carga masiva)
+│   └── admin-reinicio.js     Pestaña "Reiniciar"
+├── data/torneo.json          Estado del torneo, versionado
+└── assets/                   Recursos estáticos
 ```
 
 ### Separación de responsabilidades
@@ -50,12 +55,20 @@ Administrador → carga marcador → valida → propaga al siguiente partido
 | Módulo | Responsabilidad | DOM | Red |
 |---|---|---|---|
 | `config.js` | Configuración | No | No |
-| `bracket.js` | Reglas del torneo | No | No |
+| `bracket.js` | Reglas de los resultados | No | No |
+| `generador.js` | Armado del cuadro y reinicio | No | No |
 | `ui.js` | Render | Sí | No |
 | `github.js` | Persistencia remota | No | Sí |
 | `storage.js` | Lectura y sesión | No | Sí (lectura) |
 | `auth.js` | Autenticación | No | No |
-| `app.js` / `admin.js` | Orquestación | Sí | — |
+| `admin-estado.js` | Estado compartido y publicación | No | Sí (delega) |
+| `app.js`, `admin.js`, `admin-*.js` | Orquestación | Sí | — |
+
+El dominio está partido en dos módulos a propósito. `bracket.js` gobierna los
+**resultados** (validar un marcador, propagar al ganador, invalidar en cascada);
+`generador.js` gobierna la **configuración** del cuadro (armarlo desde una lista,
+reiniciarlo). Son operaciones con reglas y riesgos distintos: cargar un marcador
+afecta una rama, rearmar el cuadro reemplaza el torneo entero.
 
 Dos decisiones sostienen el diseño:
 
@@ -63,11 +76,19 @@ Dos decisiones sostienen el diseño:
 dominio recibe y devuelve datos planos, así que se puede probar sin navegador y
 el diseño se puede rehacer sin riesgo de romper la lógica del torneo.
 
-**Un solo renderer para las dos páginas.** `renderizarBracket()` acepta un hook
-`pie` con el que el panel inyecta su formulario debajo de cada tarjeta. No hay
-dos implementaciones del bracket que mantener sincronizadas, y la página pública
-sigue sin cargar una sola línea de código administrativo: `index.html` importa
-`app.js`, que no depende de `auth.js` ni de `github.js`.
+**Un solo renderer para todas las pantallas.** `renderizarBracket()` acepta un
+hook `pie` con el que el panel inyecta su formulario debajo de cada tarjeta. Ese
+mismo renderer dibuja el bracket público, el editable y la previsualización de la
+carga masiva: no hay tres implementaciones que mantener sincronizadas, y lo que
+se previsualiza es exactamente lo que se publica. La página pública sigue sin
+cargar una sola línea de código administrativo: `index.html` importa `app.js`,
+que no depende de `auth.js`, `github.js` ni de ningún módulo `admin-*`.
+
+**Un único estado compartido.** Las tres pestañas leen y escriben a través de
+`admin-estado.js`, que centraliza el commit y notifica a los suscriptores. Por
+eso un cambio hecho en cualquier pestaña se refleja de inmediato en las otras
+dos, y el estado local se adopta sólo si el commit en GitHub salió bien: lo que
+se ve en pantalla siempre coincide con lo publicado.
 
 ---
 
@@ -100,10 +121,56 @@ alcance a otros repositorios ni a la organización.
 
 ### 4. Administrar
 
-Entrá a `admin.html`, ingresá con las credenciales de `config.js` y pegá el
-token. Cargá un marcador y presioná **Guardar**: el ganador se determina solo, se
-propaga a la ronda siguiente y se crea el commit. GitHub Pages tarda hasta un
-minuto en publicar el cambio.
+Entrá a `admin.html` e ingresá con las credenciales de `config.js` y el token. El
+panel tiene tres pestañas.
+
+#### Resultados
+
+Cargá un marcador y presioná **Guardar**: el ganador se determina solo, se propaga
+a la ronda siguiente y se crea el commit. GitHub Pages tarda hasta un minuto en
+publicar el cambio.
+
+#### Equipos — carga masiva
+
+Pegá la lista de participantes y el cuadro se arma completo, sin tocar el JSON.
+El orden define los cruces: el primero juega contra el segundo, el tercero contra
+el cuarto, y así.
+
+Acepta un nombre por línea y también listas separadas por comas, punto y coma o
+tabulaciones, de modo que pegar desde una planilla funciona igual. Al interpretar
+la lista descarta sola la numeración (`1.`, `2)`, `-`), las líneas vacías y los
+nombres repetidos, comparando sin distinguir mayúsculas ni acentos. Un nombre que
+empieza con número, como "9 de Julio", se conserva intacto.
+
+Mientras escribís, el panel informa cuántos participantes detectó y **previsualiza
+el cuadro** con el mismo renderer del sitio público. El botón de publicar recién
+se habilita cuando la lista forma un cuadro válido.
+
+Un cuadro necesita una potencia de 2 (2, 4, 8, 16, 32 o 64). Si la cantidad no da,
+el botón **Completar con "Libre"** rellena los lugares vacantes hasta la potencia
+siguiente. Los vacantes se numeran ("Libre 1", "Libre 2", …) porque todo el
+sistema identifica a los participantes por su nombre: dos equipos homónimos en un
+mismo partido se pintarían los dos como ganadores. Esos partidos se resuelven con
+un clic desde la pestaña de resultados.
+
+**Cargar los actuales** trae los participantes del torneo vigente al cuadro de
+texto, para editar la lista en lugar de escribirla de nuevo.
+
+Publicar reemplaza el torneo completo, así que la confirmación avisa cuántos
+resultados se van a perder.
+
+#### Reiniciar
+
+Borra todos los marcadores y ganadores conservando los participantes de la
+primera ronda. Antes de ejecutarlo la pantalla muestra cuántos resultados se van
+a borrar y qué participantes se conservan, y el botón sólo se habilita después de
+escribir `REINICIAR`.
+
+Para empezar con **otros** participantes, el flujo es la pestaña Equipos, que
+rearma el cuadro entero.
+
+En los dos casos la versión anterior del torneo queda en el historial de commits
+del repositorio, así que siempre se puede recuperar desde GitHub.
 
 ### Desarrollo local
 
@@ -141,9 +208,13 @@ python -m http.server 4173
 | `ganador` | Nombre del ganador, o `null` |
 | `siguiente` | Partido de la ronda posterior que recibe al ganador; `null` en la final |
 
-**Agregar o cambiar participantes** requiere editar únicamente este archivo. La
-cantidad de rondas, columnas y la posición de cada partido se derivan de su
-contenido: el bracket se adapta solo a 2, 4, 8 o 16 participantes.
+**Editar este archivo a mano es opcional**: la pestaña Equipos del panel arma el
+cuadro entero desde una lista de nombres y lo commitea. La descripción del formato
+queda documentada para quien prefiera editarlo directamente o necesite revisar un
+torneo existente.
+
+La cantidad de rondas, columnas y la posición de cada partido se derivan del
+contenido: el bracket se adapta solo de 2 a 64 participantes.
 
 `siguiente` acepta el `id` del partido destino o su posición dentro de la ronda
 siguiente; ambas formas se resuelven automáticamente. El slot que ocupa el
@@ -242,6 +313,13 @@ El diseño deja lugar para crecer sin rehacer la arquitectura:
 | Estadísticas | Funciones puras nuevas en `bracket.js`, junto a `calcularAvance()` |
 | Tema claro/oscuro | Todos los colores derivan de variables `--bs-*`: alcanza con `data-bs-theme` |
 | Internacionalización | Los textos están agrupados en `ui.js` y en los orquestadores |
+| Pantallas nuevas en el panel | Un módulo con `inicializar(dom)` y `renderizar(torneo)`, más una pestaña en `admin.html` |
+| Sembrado por ranking | Reordenar la lista antes de `generarTorneo()`; el resto del dominio no cambia |
+| Byes automáticos | Resolver los cruces con lugares "Libre" al generar, en lugar de dejarlos al administrador |
+
+Las pestañas del panel siguen un contrato uniforme —`inicializar(dom)` y
+`renderizar(torneo)`— y se registran en un único arreglo de `admin.js`. Agregar
+una pantalla no obliga a tocar las existentes.
 
 ---
 
@@ -261,4 +339,31 @@ El proyecto se probó en el navegador antes de publicarse. Se confirmó que:
 - Cambiar un resultado de octavos invalida en cascada cuartos, semifinal y final.
 - El JSON enviado conserva indentación y acentos (codificación UTF-8 → Base64).
 - Un conflicto 409 dispara un reintento con el SHA actualizado; si persiste, se
-  informa sin sobrescribir. Los errores 401 y 404 producen mensajes accionables.
+  informa sin sobrescribir. Los errores 401 y 404 producen mensajes accionables,
+  distinguiendo si falló el repositorio o el archivo.
+
+Sobre las pantallas de configuración:
+
+- El parseo resuelve en una sola lista numeración, viñetas, comas, punto y coma,
+  tabulaciones y líneas vacías, y descarta repetidos ignorando mayúsculas y
+  acentos ("jorgito" y "JORGITÓ" cuentan como "Jorgito"). "9 de Julio" y
+  "25 de Mayo" conservan su prefijo numérico.
+- El cuadro se genera correctamente para 2, 8 y 16 participantes, con nombres de
+  ronda, `id` y `siguiente` calculados solos, y se rechazan las cantidades que no
+  son potencia de 2 y los torneos sin nombre.
+- Un cuadro generado desde cero se juega de punta a punta hasta consagrar campeón,
+  lo que confirma que `generador.js` produce estructuras que `bracket.js` acepta.
+- El reinicio borra 10 resultados, conserva los 16 participantes de la primera
+  ronda, vacía el resto del cuadro, preserva `id` y `siguiente`, no muta el
+  original y es idempotente (la segunda vez informa que no hay nada que borrar).
+- Completar un cuadro de 12 produce 16 con vacantes numerados. La primera versión
+  generaba 13 porque los "Libre" se deduplicaban entre sí; se corrigió durante la
+  verificación.
+- Publicar desde la pestaña Equipos actualiza la pestaña Resultados sin recargar
+  la página, lo que confirma que el estado compartido notifica correctamente.
+- El botón de reinicio se habilita con `reiniciar`, `REINICIAR` y con espacios
+  alrededor, pero no con una palabra distinta.
+- En móvil las tres pestañas se ven sin que la página desborde en horizontal, y
+  tanto el bracket como la previsualización se desplazan dentro de su contenedor.
+- La página pública carga sólo `app.js`, `storage.js`, `bracket.js`, `ui.js` y
+  `config.js`: ni `generador.js` ni ningún módulo `admin-*` llegan al visitante.
