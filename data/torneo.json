@@ -45,9 +45,9 @@
           "id": 5,
           "equipo1": "Block",
           "equipo2": "Óreo",
-          "score1": 0,
+          "score1": 1,
           "score2": 0,
-          "ganador": null,
+          "ganador": "Block",
           "siguiente": 19
         },
         {
@@ -174,7 +174,7 @@
         },
         {
           "id": 19,
-          "equipo1": null,
+          "equipo1": "Block",
           "equipo2": null,
           "score1": 0,
           "score2": 0,
