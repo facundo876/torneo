@@ -61,18 +61,29 @@ function cabeceras() {
 
 /**
  * Traduce un error HTTP de la API en un mensaje accionable en español.
+ *
+ * El 404 se redacta según el recurso consultado. La distinción importa: la API
+ * devuelve 404 —y no 403— cuando el token no alcanza el repositorio, para no
+ * revelar si existe. Atribuir siempre ese 404 al archivo manda a revisar la
+ * ruta cuando el problema real puede estar en el usuario, el repositorio o el
+ * alcance del token.
+ *
  * @param {number} status
  * @param {object} cuerpo respuesta JSON de la API (puede estar vacía)
+ * @param {string} url URL consultada, para identificar el recurso
  * @returns {ErrorGitHub}
  */
-function traducirError(status, cuerpo) {
+function traducirError(status, cuerpo, url) {
   const { usuario, repositorio, branch, rutaJson } = CONFIG.github;
   const detalle = cuerpo?.message ? ` (${cuerpo.message})` : '';
+  const esArchivo = url.includes('/contents/');
 
   const mensajes = {
     401: 'El token de GitHub es inválido o expiró. Generá uno nuevo y volvé a iniciar sesión.',
     403: `El token no tiene permiso de escritura sobre ${usuario}/${repositorio}, o se alcanzó el límite de la API.`,
-    404: `No se encontró ${usuario}/${repositorio}/${rutaJson} en la rama "${branch}". Revisá la configuración y los permisos del token.`,
+    404: esArchivo
+      ? `No se encontró el archivo "${rutaJson}" en la rama "${branch}" de ${usuario}/${repositorio}. Revisá "rutaJson" y "branch" en config.js.`
+      : `No se encontró el repositorio ${usuario}/${repositorio}, o el token no tiene acceso. Revisá "usuario" y "repositorio" en config.js, y que el token incluya este repositorio.`,
     409: 'El archivo cambió en GitHub mientras editabas. Recargá el torneo y aplicá el cambio de nuevo.',
     422: 'GitHub rechazó el commit: el archivo fue modificado por otra persona o la rama no existe.',
   };
@@ -100,7 +111,7 @@ async function llamar(url, opciones = {}) {
   }
 
   const cuerpo = await respuesta.json().catch(() => ({}));
-  if (!respuesta.ok) throw traducirError(respuesta.status, cuerpo);
+  if (!respuesta.ok) throw traducirError(respuesta.status, cuerpo, url);
   return cuerpo;
 }
 

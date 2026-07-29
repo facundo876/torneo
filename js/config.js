@@ -19,7 +19,7 @@ export const CONFIG = Object.freeze({
   /** Datos del repositorio donde vive el JSON versionado del torneo. */
   github: Object.freeze({
     /** Usuario u organización dueña del repositorio. */
-    usuario: 'facundoarce',
+    usuario: 'facundo876',
     /** Nombre del repositorio. */
     repositorio: 'torneo',
     /** Rama sobre la que se commitean los cambios. */
