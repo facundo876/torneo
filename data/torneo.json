@@ -3,79 +3,228 @@
   "fecha": "2026-08-01",
   "rondas": [
     {
-      "nombre": "Octavos",
+      "nombre": "Dieciseisavos",
       "partidos": [
         {
           "id": 1,
-          "equipo1": "Jorgito",
-          "equipo2": "Guaymallén",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 9
-        },
-        {
-          "id": 2,
-          "equipo1": "Havanna",
-          "equipo2": "Cachafaz",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 9
-        },
-        {
-          "id": 3,
-          "equipo1": "Terrabusi",
-          "equipo2": "Fantoche",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 10
-        },
-        {
-          "id": 4,
-          "equipo1": "Milka",
-          "equipo2": "Capitán del Espacio",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 10
-        },
-        {
-          "id": 5,
-          "equipo1": "Águila",
-          "equipo2": "Balcarce",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 11
-        },
-        {
-          "id": 6,
-          "equipo1": "Tofi",
-          "equipo2": "Bon o Bon",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 11
-        },
-        {
-          "id": 7,
-          "equipo1": "Vauquita",
-          "equipo2": "Rasta",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
-          "siguiente": 12
-        },
-        {
-          "id": 8,
-          "equipo1": "Suchard",
+          "equipo1": "Milka Mouse",
           "equipo2": "Tita",
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 12
+          "siguiente": 17
+        },
+        {
+          "id": 2,
+          "equipo1": "Jorgelin Chocolate",
+          "equipo2": "Vauquita",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 17
+        },
+        {
+          "id": 3,
+          "equipo1": "Havanna Chocolate",
+          "equipo2": "Guaymallén",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 18
+        },
+        {
+          "id": 4,
+          "equipo1": "Bon o Bon",
+          "equipo2": "Mantecol",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 18
+        },
+        {
+          "id": 5,
+          "equipo1": "Block",
+          "equipo2": "Óreo",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 19
+        },
+        {
+          "id": 6,
+          "equipo1": "Shot",
+          "equipo2": "Matilda",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 19
+        },
+        {
+          "id": 7,
+          "equipo1": "Goat",
+          "equipo2": "Vimar",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 20
+        },
+        {
+          "id": 8,
+          "equipo1": "Suchard",
+          "equipo2": "Pepitos",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 20
+        },
+        {
+          "id": 9,
+          "equipo1": "Terrabussi",
+          "equipo2": "Tofi",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 21
+        },
+        {
+          "id": 10,
+          "equipo1": "Jorgito",
+          "equipo2": "Tatín",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 21
+        },
+        {
+          "id": 11,
+          "equipo1": "Rasta Negro",
+          "equipo2": "Águila Clásico",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 22
+        },
+        {
+          "id": 12,
+          "equipo1": "Cachafaz Negro",
+          "equipo2": "Red Velvet",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 22
+        },
+        {
+          "id": 13,
+          "equipo1": "Blanco y Negro",
+          "equipo2": "Fulbito",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 23
+        },
+        {
+          "id": 14,
+          "equipo1": "Capitán del Espacio",
+          "equipo2": "Grandote Triple",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 23
+        },
+        {
+          "id": 15,
+          "equipo1": "Guolis Intenso Negro",
+          "equipo2": "Fantoche",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 24
+        },
+        {
+          "id": 16,
+          "equipo1": "Martínez",
+          "equipo2": "Cofler",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 24
+        }
+      ]
+    },
+    {
+      "nombre": "Octavos",
+      "partidos": [
+        {
+          "id": 17,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 25
+        },
+        {
+          "id": 18,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 25
+        },
+        {
+          "id": 19,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 26
+        },
+        {
+          "id": 20,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 26
+        },
+        {
+          "id": 21,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 27
+        },
+        {
+          "id": 22,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 27
+        },
+        {
+          "id": 23,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 28
+        },
+        {
+          "id": 24,
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
+          "siguiente": 28
         }
       ]
     },
@@ -83,40 +232,40 @@
       "nombre": "Cuartos",
       "partidos": [
         {
-          "id": 9,
+          "id": 25,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 13
+          "siguiente": 29
         },
         {
-          "id": 10,
+          "id": 26,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 13
+          "siguiente": 29
         },
         {
-          "id": 11,
+          "id": 27,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 14
+          "siguiente": 30
         },
         {
-          "id": 12,
+          "id": 28,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 14
+          "siguiente": 30
         }
       ]
     },
@@ -124,22 +273,22 @@
       "nombre": "Semifinal",
       "partidos": [
         {
-          "id": 13,
+          "id": 29,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 15
+          "siguiente": 31
         },
         {
-          "id": 14,
+          "id": 30,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
-          "siguiente": 15
+          "siguiente": 31
         }
       ]
     },
@@ -147,7 +296,7 @@
       "nombre": "Final",
       "partidos": [
         {
-          "id": 15,
+          "id": 31,
           "equipo1": null,
           "equipo2": null,
           "score1": 0,
