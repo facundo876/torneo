@@ -9,63 +9,63 @@
           "id": 1,
           "equipo1": "Jorgito",
           "equipo2": "Guaymallén",
-          "score1": 3,
-          "score2": 1,
-          "ganador": "Jorgito",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 9
         },
         {
           "id": 2,
           "equipo1": "Havanna",
           "equipo2": "Cachafaz",
-          "score1": 2,
-          "score2": 4,
-          "ganador": "Cachafaz",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 9
         },
         {
           "id": 3,
           "equipo1": "Terrabusi",
           "equipo2": "Fantoche",
-          "score1": 1,
+          "score1": 0,
           "score2": 0,
-          "ganador": "Terrabusi",
+          "ganador": null,
           "siguiente": 10
         },
         {
           "id": 4,
           "equipo1": "Milka",
           "equipo2": "Capitán del Espacio",
-          "score1": 2,
-          "score2": 3,
-          "ganador": "Capitán del Espacio",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 10
         },
         {
           "id": 5,
           "equipo1": "Águila",
           "equipo2": "Balcarce",
-          "score1": 5,
-          "score2": 2,
-          "ganador": "Águila",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 11
         },
         {
           "id": 6,
           "equipo1": "Tofi",
           "equipo2": "Bon o Bon",
-          "score1": 1,
-          "score2": 2,
-          "ganador": "Bon o Bon",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 11
         },
         {
           "id": 7,
           "equipo1": "Vauquita",
           "equipo2": "Rasta",
-          "score1": 3,
-          "score2": 2,
-          "ganador": "Vauquita",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 12
         },
         {
@@ -73,8 +73,8 @@
           "equipo1": "Suchard",
           "equipo2": "Tita",
           "score1": 0,
-          "score2": 1,
-          "ganador": "Tita",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 12
         }
       ]
@@ -84,38 +84,38 @@
       "partidos": [
         {
           "id": 9,
-          "equipo1": "Jorgito",
-          "equipo2": "Cachafaz",
-          "score1": 2,
-          "score2": 1,
-          "ganador": "Jorgito",
+          "equipo1": null,
+          "equipo2": null,
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 13
         },
         {
           "id": 10,
-          "equipo1": "Terrabusi",
-          "equipo2": "Capitán del Espacio",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
-          "score2": 2,
-          "ganador": "Capitán del Espacio",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 13
         },
         {
           "id": 11,
-          "equipo1": "Águila",
-          "equipo2": "Bon o Bon",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
-          "score2": 1,
-          "ganador": "Bon o Bon",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 14
         },
         {
           "id": 12,
-          "equipo1": "Vauquita",
-          "equipo2": "Tita",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
-          "score2": 1,
-          "ganador": "Tita",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 14
         }
       ]
@@ -125,20 +125,20 @@
       "partidos": [
         {
           "id": 13,
-          "equipo1": "Jorgito",
-          "equipo2": "Capitán del Espacio",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
-          "score2": 1,
-          "ganador": "Capitán del Espacio",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 15
         },
         {
           "id": 14,
-          "equipo1": "Bon o Bon",
-          "equipo2": "Tita",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
-          "score2": 1,
-          "ganador": "Tita",
+          "score2": 0,
+          "ganador": null,
           "siguiente": 15
         }
       ]
@@ -148,8 +148,8 @@
       "partidos": [
         {
           "id": 15,
-          "equipo1": "Capitán del Espacio",
-          "equipo2": "Tita",
+          "equipo1": null,
+          "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
