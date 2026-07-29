@@ -1,0 +1,317 @@
+/**
+ * styles.css
+ * ---------------------------------------------------------------------------
+ * Estilos propios del bracket. Bootstrap aporta la tipografía, la grilla y los
+ * componentes; acá sólo se resuelve lo que Bootstrap no cubre: el layout de
+ * columnas del bracket, los conectores y el código de colores por estado.
+ *
+ * Todos los colores derivan de variables de Bootstrap (`--bs-*`), de modo que
+ * activar el tema oscuro (`<html data-bs-theme="dark">`) no requiere tocar
+ * este archivo.
+ */
+
+/* ---------------------------------------------------------------------------
+   Variables
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Separación horizontal entre rondas. Es también el espacio donde se dibujan
+     los conectores, por eso se usa en los cálculos de posición. */
+  --bracket-gap: 2.75rem;
+  /* Ancho de cada columna. */
+  --bracket-ancho-ronda: 15rem;
+  /* Separación vertical mínima entre tarjetas de una misma ronda. */
+  --bracket-aire: 0.5rem;
+  --bracket-linea: var(--bs-border-color);
+  --bracket-grosor-linea: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Contenedor con desplazamiento
+   En pantallas chicas el bracket no entra: se desplaza horizontalmente en
+   lugar de comprimir las tarjetas hasta volverlas ilegibles.
+   --------------------------------------------------------------------------- */
+
+.bracket-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 1rem;
+  /* El contenedor es focusable para permitir desplazamiento con teclado. */
+  scroll-behavior: smooth;
+}
+
+.bracket-scroll:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 4px;
+  border-radius: var(--bs-border-radius);
+}
+
+/* ---------------------------------------------------------------------------
+   Grilla del bracket
+   El número de columnas lo determina el JSON: acá no hay nada codificado por
+   ronda. Cada columna se estira a la altura del contenedor y reparte sus
+   partidos en franjas de igual alto, lo que alinea automáticamente cada par
+   con el partido que lo recibe en la ronda siguiente.
+   --------------------------------------------------------------------------- */
+
+.bracket {
+  display: flex;
+  align-items: stretch;
+  gap: var(--bracket-gap);
+  /* Impide que flexbox comprima las columnas: fuerza el scroll horizontal. */
+  min-width: max-content;
+  padding: 0.25rem;
+}
+
+.bracket__ronda {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--bracket-ancho-ronda);
+  width: var(--bracket-ancho-ronda);
+}
+
+.bracket__titulo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.75rem;
+}
+
+.bracket__pista {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+/* Cada partido vive en una franja de alto idéntico dentro de su ronda. Esa
+   uniformidad es lo que hace que los conectores caigan siempre en su lugar. */
+.bracket__slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  padding: var(--bracket-aire) 0;
+}
+
+.bracket__slot > .partido {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+   Conectores
+   Se dibujan con pseudo-elementos dentro del gap entre columnas y sólo cuando
+   el bracket está balanceado (bracket.js decide y marca la clase).
+
+   - `::after`  línea que sale de cada tarjeta hacia la derecha.
+   - `.bracket__union` barra vertical que une el par de tarjetas: parte del
+     centro de la tarjeta par y baja exactamente el alto de una franja, que es
+     la distancia hasta el centro de la tarjeta impar.
+   - `::before` línea que entra a la tarjeta de la ronda siguiente, cuyo centro
+     coincide con el punto medio de esa barra vertical.
+   --------------------------------------------------------------------------- */
+
+.bracket__ronda--conectada .bracket__slot::after,
+.bracket__ronda--conectada + .bracket__ronda .bracket__slot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(var(--bracket-gap) / 2);
+  height: var(--bracket-grosor-linea);
+  background-color: var(--bracket-linea);
+}
+
+.bracket__ronda--conectada .bracket__slot::after {
+  left: 100%;
+}
+
+.bracket__ronda--conectada + .bracket__ronda .bracket__slot::before {
+  right: 100%;
+}
+
+.bracket__union {
+  position: absolute;
+  left: calc(100% + var(--bracket-gap) / 2);
+  top: 50%;
+  width: var(--bracket-grosor-linea);
+  height: 100%;
+  background-color: var(--bracket-linea);
+}
+
+/* ---------------------------------------------------------------------------
+   Tarjeta de partido
+   El estado se comunica con un borde lateral de color, más sobrio que teñir
+   la tarjeta entera.
+   --------------------------------------------------------------------------- */
+
+.partido {
+  border-left: 4px solid var(--bs-border-color);
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.partido:hover {
+  box-shadow: var(--bs-box-shadow) !important;
+}
+
+.partido--finalizado { border-left-color: var(--bs-success); }
+.partido--listo      { border-left-color: var(--bs-warning); }
+.partido--pendiente  { border-left-color: var(--bs-secondary-bg); }
+
+.partido__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.partido__id {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+}
+
+.partido__cabecera .badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.partido__cuerpo {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Filas de equipo
+   Código de colores: ganador verde, eliminado gris, pendiente amarillo.
+   --------------------------------------------------------------------------- */
+
+.equipo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--bs-border-radius-sm);
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+
+.equipo__nombre {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equipo__score {
+  flex: 0 0 auto;
+  min-width: 1.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.equipo--ganador {
+  background-color: var(--bs-success-bg-subtle);
+  color: var(--bs-success-text-emphasis);
+  font-weight: 600;
+}
+
+.equipo--perdedor {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-secondary-color);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* Partido con ambos equipos definidos pero todavía sin jugar. */
+.equipo--neutral {
+  background-color: var(--bs-warning-bg-subtle);
+  color: var(--bs-warning-text-emphasis);
+}
+
+/* Participante aún no clasificado. */
+.equipo--indefinido {
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------------------
+   Formulario de carga (sólo presente en el panel de administración)
+   --------------------------------------------------------------------------- */
+
+.partido__pie {
+  padding: 0.5rem;
+  background-color: var(--bs-body-bg);
+}
+
+.partido__scores {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.partido__separador {
+  color: var(--bs-secondary-color);
+  font-weight: 600;
+}
+
+.partido__scores .form-control {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------
+   Leyenda de colores
+   --------------------------------------------------------------------------- */
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  color: var(--bs-secondary-color);
+}
+
+.leyenda__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.leyenda__muestra {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 0.2rem;
+  border: 1px solid var(--bs-border-color);
+}
+
+.leyenda__muestra--ganador   { background-color: var(--bs-success-bg-subtle); }
+.leyenda__muestra--perdedor  { background-color: var(--bs-secondary-bg); }
+.leyenda__muestra--pendiente { background-color: var(--bs-warning-bg-subtle); }
+
+/* ---------------------------------------------------------------------------
+   Ajustes responsive
+   En móvil se achican columnas y separación: el bracket sigue completo y se
+   recorre con scroll horizontal.
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 575.98px) {
+  :root {
+    --bracket-gap: 1.75rem;
+    --bracket-ancho-ronda: 12.5rem;
+  }
+}
+
+/* Respeta la preferencia de movimiento reducido del sistema. */
+@media (prefers-reduced-motion: reduce) {
+  .bracket-scroll { scroll-behavior: auto; }
+  .partido { transition: none; }
+}
