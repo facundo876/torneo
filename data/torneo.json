@@ -18,9 +18,9 @@
           "id": 2,
           "equipo1": "Jorgelin Chocolate",
           "equipo2": "Vauquita",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 6,
+          "score2": 1,
+          "ganador": "Jorgelin Chocolate",
           "siguiente": 17
         },
         {
@@ -157,7 +157,7 @@
         {
           "id": 17,
           "equipo1": null,
-          "equipo2": null,
+          "equipo2": "Jorgelin Chocolate",
           "score1": 0,
           "score2": 0,
           "ganador": null,
