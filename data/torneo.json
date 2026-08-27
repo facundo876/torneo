@@ -126,9 +126,9 @@
           "id": 14,
           "equipo1": "Capitán del Espacio",
           "equipo2": "Escolar",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 6,
+          "score2": 1,
+          "ganador": "Capitán del Espacio",
           "siguiente": 23
         },
         {
@@ -211,7 +211,7 @@
         {
           "id": 23,
           "equipo1": "Fulbito",
-          "equipo2": null,
+          "equipo2": "Capitán del Espacio",
           "score1": 0,
           "score2": 0,
           "ganador": null,
