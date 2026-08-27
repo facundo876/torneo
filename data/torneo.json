@@ -54,9 +54,9 @@
           "id": 6,
           "equipo1": "Shot",
           "equipo2": "Matilda",
-          "score1": 5,
-          "score2": 2,
-          "ganador": "Shot",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 19
         },
         {
@@ -175,7 +175,7 @@
         {
           "id": 19,
           "equipo1": "Block",
-          "equipo2": "Shot",
+          "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
