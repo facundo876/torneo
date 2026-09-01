@@ -89,7 +89,7 @@
         {
           "id": 10,
           "equipo1": "Jorgito",
-          "equipo2": "Tatín",
+          "equipo2": "Marley",
           "score1": 0,
           "score2": 0,
           "ganador": null,
@@ -97,8 +97,8 @@
         },
         {
           "id": 11,
-          "equipo1": "Rasta Negro",
-          "equipo2": "Águila Clásico",
+          "equipo1": "Rasta Blanco",
+          "equipo2": "Águila Blanco",
           "score1": 0,
           "score2": 0,
           "ganador": null,
