@@ -72,9 +72,9 @@
           "id": 8,
           "equipo1": "Cocolate",
           "equipo2": "Pepitos",
-          "score1": 5,
-          "score2": 2,
-          "ganador": "Cocolate",
+          "score1": 0,
+          "score2": 0,
+          "ganador": null,
           "siguiente": 20
         },
         {
@@ -99,9 +99,9 @@
           "id": 11,
           "equipo1": "Rasta Blanco",
           "equipo2": "Águila Blanco",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 6,
+          "score2": 1,
+          "ganador": "Rasta Blanco",
           "siguiente": 22
         },
         {
@@ -184,7 +184,7 @@
         {
           "id": 20,
           "equipo1": "Goat",
-          "equipo2": "Cocolate",
+          "equipo2": null,
           "score1": 0,
           "score2": 0,
           "ganador": null,
@@ -201,7 +201,7 @@
         },
         {
           "id": 22,
-          "equipo1": null,
+          "equipo1": "Rasta Blanco",
           "equipo2": null,
           "score1": 0,
           "score2": 0,
