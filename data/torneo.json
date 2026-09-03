@@ -36,9 +36,9 @@
           "id": 4,
           "equipo1": "Bon o Bon",
           "equipo2": "Mantecol",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 4,
+          "score2": 3,
+          "ganador": "Bon o Bon",
           "siguiente": 18
         },
         {
@@ -166,7 +166,7 @@
         {
           "id": 18,
           "equipo1": null,
-          "equipo2": null,
+          "equipo2": "Bon o Bon",
           "score1": 0,
           "score2": 0,
           "ganador": null,
