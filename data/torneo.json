@@ -90,9 +90,9 @@
           "id": 10,
           "equipo1": "Jorgito",
           "equipo2": "Marley",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 6,
+          "score2": 1,
+          "ganador": "Jorgito",
           "siguiente": 21
         },
         {
@@ -193,7 +193,7 @@
         {
           "id": 21,
           "equipo1": "Terrabussi",
-          "equipo2": null,
+          "equipo2": "Jorgito",
           "score1": 0,
           "score2": 0,
           "ganador": null,
