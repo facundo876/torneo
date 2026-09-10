@@ -108,9 +108,9 @@
           "id": 12,
           "equipo1": "Cachafaz Negro",
           "equipo2": "Red Velvet",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 5,
+          "score2": 2,
+          "ganador": "Cachafaz Negro",
           "siguiente": 22
         },
         {
@@ -202,7 +202,7 @@
         {
           "id": 22,
           "equipo1": "Rasta Blanco",
-          "equipo2": null,
+          "equipo2": "Cachafaz Negro",
           "score1": 0,
           "score2": 0,
           "ganador": null,
