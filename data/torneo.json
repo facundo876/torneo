@@ -203,9 +203,9 @@
           "id": 22,
           "equipo1": "Rasta Blanco",
           "equipo2": "Cachafaz Negro",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 3,
+          "score2": 4,
+          "ganador": "Cachafaz Negro",
           "siguiente": 27
         },
         {
@@ -252,7 +252,7 @@
         {
           "id": 27,
           "equipo1": "Jorgito",
-          "equipo2": null,
+          "equipo2": "Cachafaz Negro",
           "score1": 0,
           "score2": 0,
           "ganador": null,
