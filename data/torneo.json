@@ -221,9 +221,9 @@
           "id": 24,
           "equipo1": "Fantoche",
           "equipo2": "Martínez Pistacho",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 4,
+          "score2": 3,
+          "ganador": "Fantoche",
           "siguiente": 28
         }
       ]
@@ -261,7 +261,7 @@
         {
           "id": 28,
           "equipo1": "Capitán del Espacio",
-          "equipo2": null,
+          "equipo2": "Fantoche",
           "score1": 0,
           "score2": 0,
           "ganador": null,
