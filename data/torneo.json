@@ -185,9 +185,9 @@
           "id": 20,
           "equipo1": "Goat",
           "equipo2": "Cocolate",
-          "score1": 0,
-          "score2": 0,
-          "ganador": null,
+          "score1": 4,
+          "score2": 3,
+          "ganador": "Goat",
           "siguiente": 26
         },
         {
@@ -243,7 +243,7 @@
         {
           "id": 26,
           "equipo1": "Shot",
-          "equipo2": null,
+          "equipo2": "Goat",
           "score1": 0,
           "score2": 0,
           "ganador": null,
